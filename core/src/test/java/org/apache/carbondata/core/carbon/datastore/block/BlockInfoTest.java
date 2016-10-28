@@ -69,6 +69,4 @@ public class BlockInfoTest {
         Boolean res = blockInfoTest.equals(blockInfo);
         assert (!res);
     }
-
-
 }
