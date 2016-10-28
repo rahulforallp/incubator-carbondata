@@ -20,54 +20,54 @@ public class BlockInfoTest {
     @Test
     public void equalsTestwithSameObject() {
         Boolean res = blockInfo.equals(blockInfo);
-        assert (res == true);
+        assert (res);
     }
 
     @Test
     public void equalsTestWithSimilarObject() {
         BlockInfo blockInfoTest = new BlockInfo(new TableBlockInfo("filePath", 6, "segmentId", null, 6));
         Boolean res = blockInfo.equals(blockInfoTest);
-        assert (res == true);
+        assert (res);
     }
 
     @Test
     public void equalsTestWithNullObject() {
         Boolean res = blockInfo.equals(null);
-        assert (res == false);
+        assert (!res);
     }
 
     @Test
     public void equalsTestWithStringObject() {
         Boolean res = blockInfo.equals("dummy");
-        assert (res == false);
+        assert (!res);
     }
 
     @Test
     public void equalsTestWithDifferentSegmentId() {
         BlockInfo blockInfoTest = new BlockInfo(new TableBlockInfo("filePath", 6, "diffSegmentId", null, 6));
         Boolean res = blockInfo.equals(blockInfoTest);
-        assert (res == false);
+        assert (!res);
     }
 
     @Test
     public void equalsTestWithDifferentOffset() {
         BlockInfo blockInfoTest = new BlockInfo(new TableBlockInfo("filePath", 62, "segmentId", null, 6));
         Boolean res = blockInfo.equals(blockInfoTest);
-        assert (res == false);
+        assert (!res );
     }
 
     @Test
     public void equalsTestWithDifferentBlockLength() {
         BlockInfo blockInfoTest = new BlockInfo(new TableBlockInfo("filePath", 6, "segmentId", null, 62));
         Boolean res = blockInfo.equals(blockInfoTest);
-        assert (res == false);
+        assert (!res);
     }
 
     @Test
     public void equalsTestWithDiffFilePath() {
         BlockInfo blockInfoTest = new BlockInfo(new TableBlockInfo("diffFilePath", 6, "segmentId", null, 62));
         Boolean res = blockInfoTest.equals(blockInfo);
-        assert (res == false);
+        assert (!res);
     }
 
 

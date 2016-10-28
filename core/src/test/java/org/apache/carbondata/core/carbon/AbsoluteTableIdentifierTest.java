@@ -25,43 +25,43 @@ public class AbsoluteTableIdentifierTest {
     @Test
     public void equalsTestWithSameInstance() {
         Boolean res = absoluteTableIdentifier.equals("wrong data");
-        assert (res == false);
+        assert (!res);
     }
 
     @Test
     public void equalsTestWithNullObject() {
         Boolean res = absoluteTableIdentifier.equals(null);
-        assert (res == false);
+        assert (!res);
     }
 
     @Test
     public void equalsTestWithotherObject() {
         Boolean res = absoluteTableIdentifier1.equals(absoluteTableIdentifier);
-        assert (res == false);
+        assert (!res);
     }
 
     @Test
     public void equalsTestWithSameObj() {
         Boolean res = absoluteTableIdentifier.equals(absoluteTableIdentifier);
-        assert (res == true);
+        assert (res);
     }
 
     @Test
     public void equalsTestWithNullColumnIdentifier() {
         Boolean res = absoluteTableIdentifier1.equals(absoluteTableIdentifier2);
-        assert (res == false);
+        assert (!res);
     }
 
     @Test
     public void equalsTestWithEqualColumnIdentifier() {
         Boolean res = absoluteTableIdentifier3.equals(absoluteTableIdentifier4);
-        assert (res == false);
+        assert (!res);
     }
 
     @Test
     public void equalsTestWithEqualAbsoluteTableIdentifier() {
         Boolean res = absoluteTableIdentifier.equals(absoluteTableIdentifier4);
-        assert (res == true);
+        assert (res);
     }
 
     @Test

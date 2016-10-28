@@ -1,8 +1,5 @@
 package org.apache.carbondata.core.carbon;
 
-/**
- * Created by rahul on 26/10/16.
- */
 
 import org.apache.carbondata.core.carbon.metadata.datatype.DataType;
 import org.junit.*;
@@ -32,40 +29,40 @@ public class ColumnIdentifierTest {
     @Test
     public void equalsTestwithSameObject() {
         Boolean res = columnIdentifier.equals(columnIdentifier);
-        assert (res == true);
+        assert (res);
     }
 
     @Test
     public void equalsTestwithSimilarObject() {
         ColumnIdentifier columnIdentifierTest = new ColumnIdentifier("columnId", columnProperties, DataType.INT);
         Boolean res = columnIdentifier.equals(columnIdentifierTest);
-        assert (res == true);
+        assert (res);
     }
 
     @Test
     public void equalsTestwithNullObject() {
         Boolean res = columnIdentifier.equals(null);
-        assert (res == false);
+        assert (!res);
     }
 
     @Test
     public void equalsTestwithStringObject() {
         Boolean res = columnIdentifier.equals("String Object");
-        assert (res == false);
+        assert (!res);
     }
 
     @Test
     public void equalsTestwithNullColumnId() {
         ColumnIdentifier columnIdentifierTest = new ColumnIdentifier(null, columnProperties, DataType.INT);
         Boolean res = columnIdentifierTest.equals(columnIdentifier);
-        assert (res == false);
+        assert (!res );
     }
 
     @Test
     public void equalsTestwithDiffColumnId() {
         ColumnIdentifier columnIdentifierTest = new ColumnIdentifier("diffColumnId", columnProperties, DataType.INT);
         Boolean res = columnIdentifierTest.equals(columnIdentifier);
-        assert (res == false);
+        assert (!res);
     }
 
     @Test

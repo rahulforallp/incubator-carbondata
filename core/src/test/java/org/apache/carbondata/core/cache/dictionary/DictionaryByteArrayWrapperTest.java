@@ -15,19 +15,19 @@ public class DictionaryByteArrayWrapperTest {
     @Test
     public void equalsTestWithString() {
         Boolean res = dictionaryByteArrayWrapper.equals("Rahul");
-        assert (res == false);
+        assert (!res);
     }
 
     @Test
     public void equalsTestWithDictionaryByteArrayWrapper() {
         Boolean res = dictionaryByteArrayWrapper.equals(new DictionaryByteArrayWrapper("Rahul".getBytes()));
-        assert (res == true);
+        assert (res);
     }
 
     @Test
     public void equalsTestWithDifferentLength() {
         Boolean res = dictionaryByteArrayWrapper.equals(new DictionaryByteArrayWrapper("Rahul ".getBytes()));
-        assert (res == false);
+        assert (!res);
     }
 
     @Test
