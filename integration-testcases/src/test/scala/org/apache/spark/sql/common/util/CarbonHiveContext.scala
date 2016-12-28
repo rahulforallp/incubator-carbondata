@@ -19,7 +19,7 @@
 
 package org.apache.spark.sql.common.util
 
-import java.io.File
+import java.io.{File, FileInputStream, InputStream}
 
 import org.apache.spark.sql.CarbonContext
 import org.apache.spark.{SparkConf, SparkContext}
@@ -30,7 +30,7 @@ import org.apache.carbondata.core.util.CarbonProperties
 class LocalSQLContext(val hdfsCarbonBasePath: String)
   extends CarbonContext(new SparkContext(new SparkConf()
     .setAppName("CarbonSpark")
-    .setMaster("local[2]")
+    .setMaster(CarbonMaster.getMaster())
     .set("spark.sql.shuffle.partitions", "20")
     .set("use_kettle_default", "true")),
     hdfsCarbonBasePath,
@@ -39,18 +39,28 @@ class LocalSQLContext(val hdfsCarbonBasePath: String)
 }
 
 object CarbonHiveContext extends LocalSQLContext(new File("./target/test/").getCanonicalPath) {
-    sparkContext.setLogLevel("ERROR")
-    val currentDirectory = new File(this.getClass.getResource("/").getPath + "/../../")
-      .getCanonicalPath
-    CarbonProperties.getInstance()
-      .addProperty("carbon.kettle.home", currentDirectory+"/../processing/carbonplugins")
-    CarbonProperties.getInstance().
-      addProperty(CarbonCommonConstants.CARBON_TIMESTAMP_FORMAT,
-        CarbonCommonConstants.CARBON_TIMESTAMP_DEFAULT_FORMAT)
-    CarbonProperties.getInstance()
-      .addProperty(CarbonCommonConstants.STORE_LOCATION_TEMP_PATH,
-        System.getProperty("java.io.tmpdir"))
+  sparkContext.setLogLevel("ERROR")
+  val currentDirectory = new File(this.getClass.getResource("/").getPath + "/../../")
+    .getCanonicalPath
+  CarbonProperties.getInstance()
+    .addProperty("carbon.kettle.home", currentDirectory + "/../processing/carbonplugins")
+  CarbonProperties.getInstance().
+    addProperty(CarbonCommonConstants.CARBON_TIMESTAMP_FORMAT,
+      CarbonCommonConstants.CARBON_TIMESTAMP_DEFAULT_FORMAT)
+  CarbonProperties.getInstance()
+    .addProperty(CarbonCommonConstants.STORE_LOCATION_TEMP_PATH,
+      System.getProperty("java.io.tmpdir"))
 
 }
 
+object CarbonMaster {
+  def getMaster(): String = {
+    val filesystem: InputStream = new FileInputStream(new File("target/classes/app.properties"))
+    val properties = new java.util.Properties()
+    properties.load(filesystem)
+    val master: String = properties.getProperty("set-master")
+    println("\n\n =========================== " + master)
+    master
+  }
+}
 
