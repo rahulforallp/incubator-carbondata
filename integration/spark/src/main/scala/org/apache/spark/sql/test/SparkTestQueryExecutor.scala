@@ -17,6 +17,9 @@
 
 package org.apache.spark.sql.test
 
+import java.io.{File, FileInputStream, InputStream}
+
+import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{CarbonContext, DataFrame, SQLContext}
 
@@ -46,10 +49,22 @@ object SparkTestQueryExecutor {
 
   val sc = new SparkContext(new SparkConf()
     .setAppName("CarbonSpark")
-    .setMaster("local[2]")
+    .setMaster(CarbonMaster.getMaster())
     .set("spark.sql.shuffle.partitions", "20")
-    .set("use_kettle_default", "true"))
+    .set("use_kettle_default", "true")
+    .setJars(Array("/usr/local/spark-1.6.2/carbonlib/carbondata_2.10-1.0.0-incubating-SNAPSHOT-shade-hadoop2.2.0.jar")))
   sc.setLogLevel("ERROR")
 
   val cc = new CarbonContext(sc, TestQueryExecutor.storeLocation, TestQueryExecutor.metastoredb)
 }
+
+object CarbonMaster {
+    def getMaster(): String = {
+        val filesystem: InputStream = new FileInputStream(new File("target/classes/app.properties"))
+        val properties = new java.util.Properties()
+        properties.load(filesystem)
+        val path: String = properties.getProperty("master-source")
+        println("\n\n ========== " + path + " =========\n")
+        path
+      }
+  }
