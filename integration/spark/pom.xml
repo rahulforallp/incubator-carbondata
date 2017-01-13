@@ -96,7 +96,7 @@
     <profile>
       <id>hadoop</id>
       <properties>
-        <master-url>spark://knoldus:7077</master-url>
+        <master-url>spark://192.168.2.142:7077</master-url>
         <base-url>hdfs://localhost:54310/</base-url>
         <file-source>${base-url}</file-source>
         <master-source>${master-url}</master-source>
@@ -121,6 +121,10 @@
       <resource>
         <directory>.</directory>
         <includes>
+          <include>**/Test*.scala</include>
+          <include>**/*Test.scala</include>
+          <include>**/*TestCase.scala</include>
+          <include>**/*Suite.scala</include>
           <include>CARBON_SPARK_INTERFACELogResource.properties</include>
         </includes>
       </resource>
@@ -189,6 +193,10 @@
             <include>**/*Test.java</include>
             <include>**/*TestCase.java</include>
             <include>**/*Suite.java</include>
+            <include>**/Test*.scala</include>
+            <include>**/*Test.scala</include>
+            <include>**/*TestCase.scala</include>
+            <include>**/*Suite.scala</include>
           </includes>
           <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
           <argLine>-Xmx3g -XX:MaxPermSize=512m -XX:ReservedCodeCacheSize=512m</argLine>

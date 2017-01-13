@@ -52,7 +52,8 @@ object SparkTestQueryExecutor {
     .setMaster(CarbonMaster.getMaster())
     .set("spark.sql.shuffle.partitions", "20")
     .set("use_kettle_default", "true")
-    .setJars(Array("/usr/local/spark-1.6.2/carbonlib/carbondata_2.10-1.0.0-incubating-SNAPSHOT-shade-hadoop2.2.0.jar")))
+      .set("spark.home","/usr/local/spark-1.6.2")
+    .setJars(JavaSparkContext.jarOfClass(this.getClass())))
   sc.setLogLevel("ERROR")
 
   val cc = new CarbonContext(sc, TestQueryExecutor.storeLocation, TestQueryExecutor.metastoredb)

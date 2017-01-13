@@ -18,9 +18,9 @@
 
 #################### System Configuration ##################
 #Mandatory. Carbon Store path
-carbon.storelocation=hdfs://hacluster/Opt/CarbonStore
+carbon.storelocation=hdfs://localhost:54310/
 #Base directory for Data files
-carbon.ddl.base.hdfs.url=hdfs://hacluster/opt/data
+#carbon.ddl.base.hdfs.url=hdfs://hacluster/opt/data
 #Path where the bad records are stored
 carbon.badRecords.location=/opt/Carbon/Spark/badrecords
 #Mandatory. path to kettle home
@@ -68,7 +68,7 @@ carbon.enable.quick.filter=false
 ##File write buffer size used during sorting.
 #carbon.sort.file.write.buffer.size=10485760
 ##Locking mechanism for data loading on a table
-#carbon.lock.type=LOCALLOCK
+carbon.lock.type=HDFSLOCK
 ##Minimum no of intermediate files after which sort merged to be started.
 #carbon.sort.intermediate.files.limit=20
 ##space reserved in percentage for writing block meta data in carbon data file
