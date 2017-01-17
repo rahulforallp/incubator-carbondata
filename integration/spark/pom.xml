@@ -96,8 +96,9 @@
     <profile>
       <id>hadoop</id>
       <properties>
+        <type>hadoop</type>
         <master-url>spark://192.168.2.142:7077</master-url>
-        <base-url>hdfs://localhost:54310/</base-url>
+        <base-url>hdfs://192.168.2.142:54311/</base-url>
         <file-source>${base-url}</file-source>
         <master-source>${master-url}</master-source>
       </properties>
@@ -105,6 +106,7 @@
     <profile>
       <id>local</id>
       <properties>
+        <type>local</type>
         <master-url>local[2]</master-url>
         <base-url>${basedir}/src/test/resources/</base-url>
         <file-source>${base-url}</file-source>

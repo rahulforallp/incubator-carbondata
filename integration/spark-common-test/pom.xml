@@ -188,7 +188,7 @@
         <id>hadoop</id>
         <properties>
           <master-url>spark://192.168.2.142:7077</master-url>
-          <base-url>hdfs://localhost:54310/</base-url>
+          <base-url>hdfs://192.168.2.142:54311/</base-url>
           <file-source>${base-url}</file-source>
           <master-source>${master-url}</master-source>
         </properties>

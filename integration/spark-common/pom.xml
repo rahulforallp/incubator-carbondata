@@ -81,7 +81,26 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
+<profiles>
+  <profile>
+    <id>hadoop</id>
+    <properties>
+      <master-url>spark://192.168.2.142:7077</master-url>
+      <base-url>hdfs://192.168.2.142:54311/</base-url>
+      <file-source>${base-url}</file-source>
+      <master-source>${master-url}</master-source>
+    </properties>
+  </profile>
+  <profile>
+    <id>local</id>
+    <properties>
+      <master-url>local[2]</master-url>
+      <base-url>${basedir}/src/test/resources/</base-url>
+      <file-source>${base-url}</file-source>
+      <master-source>${master-url}</master-source>
+    </properties>
+  </profile>
+</profiles>
   <build>
     <resources>
       <resource>
@@ -95,6 +114,24 @@
       </resource>
     </resources>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>write-project-properties</goal>
+            </goals>
+            <configuration>
+              <outputFile>
+                ${project.build.outputDirectory}/app.properties
+              </outputFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.scala-tools</groupId>
         <artifactId>maven-scala-plugin</artifactId>

@@ -17,7 +17,7 @@
 
 package org.apache.spark.sql.test
 
-import java.io.File
+import java.io.{File, FileInputStream, InputStream}
 import java.util.ServiceLoader
 
 import org.apache.spark.sql.{DataFrame, SQLContext}
@@ -38,15 +38,22 @@ object TestQueryExecutor {
 
   private val LOGGER = LogServiceFactory.getLogService(this.getClass.getCanonicalName)
 
+  val filesystem: InputStream = new FileInputStream(new File("target/classes/app.properties"))
+  val properties = new java.util.Properties()
+  properties.load(filesystem)
+  val path: String = new File (properties.getProperty("file-source")+"../../../../..").getCanonicalPath
+
+  println("\n\n ======$$====== path : "+path +"=="+properties.getProperty("type")+"======== \n")
+
   val projectPath = new File(this.getClass.getResource("/").getPath + "../../../..")
     .getCanonicalPath
   LOGGER.info(s"project path: $projectPath")
   val integrationPath = s"$projectPath/integration"
-  val resourcesPath = s"$integrationPath/spark-common-test/src/test/resources"
-  val storeLocation = s"$integrationPath/spark-common/target/store"
+  val resourcesPath = "hdfs://192.168.2.142:54311"
+  val storeLocation = "hdfs://192.168.2.142:54311/"
   val warehouse = s"$integrationPath/spark-common/target/warehouse"
   val metastoredb = s"$integrationPath/spark-common/target/metastore_db"
-  val kettleHome = s"$projectPath/processing/carbonplugins"
+  val kettleHome = "/usr/local/spark-1.6.2/carbonlib/carbonplugins"
   val timestampFormat = "dd-MM-yyyy"
 
   val INSTANCE = lookupQueryExecutor.newInstance().asInstanceOf[TestQueryExecutorRegister]
