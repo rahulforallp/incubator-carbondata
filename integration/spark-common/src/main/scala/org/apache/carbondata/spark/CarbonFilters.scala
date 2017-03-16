@@ -27,9 +27,11 @@ import org.apache.spark.sql.types.StructType
 import org.apache.carbondata.core.metadata.datatype.DataType
 import org.apache.carbondata.core.metadata.schema.table.CarbonTable
 import org.apache.carbondata.core.metadata.schema.table.column.CarbonColumn
-import org.apache.carbondata.core.scan.expression.{ColumnExpression => CarbonColumnExpression, Expression => CarbonExpression, LiteralExpression => CarbonLiteralExpression}
 import org.apache.carbondata.core.scan.expression.conditional._
-import org.apache.carbondata.core.scan.expression.logical.{AndExpression, FalseExpression, OrExpression}
+import org.apache.carbondata.core.scan.expression.logical.{AndExpression, FalseExpression,
+OrExpression}
+import org.apache.carbondata.core.scan.expression.{ColumnExpression => CarbonColumnExpression,
+Expression => CarbonExpression, LiteralExpression => CarbonLiteralExpression}
 import org.apache.carbondata.spark.util.CarbonScalaUtil
 
 /**
@@ -74,10 +76,24 @@ object CarbonFilters {
           Some(new LessThanEqualToExpression(getCarbonExpression(name),
             getCarbonLiteralExpression(name, value)))
 
-        case sources.In(name, values) =>
-          Some(new InExpression(getCarbonExpression(name),
-            new ListExpression(
-              convertToJavaList(values.map(f => getCarbonLiteralExpression(name, f)).toList))))
+        case sources.In(name, values) => {
+          if (getCarbonExpression(name) != DataType.STRING) {
+            Some(new InExpression(getCarbonExpression(name),
+              new ListExpression(
+                convertToJavaList(values
+                  .collect { case f if (f != null &&
+                                        f.toString.trim.length != 0) => getCarbonLiteralExpression(
+                    name,
+                    f)
+                  }.toList))))
+          }
+          else {
+            Some(new InExpression(getCarbonExpression(name),
+              new ListExpression(
+                convertToJavaList(values.map(f => getCarbonLiteralExpression(name, f)
+                  ).toList))))
+          }
+        }
         case sources.Not(sources.In(name, values)) =>
           Some(new NotInExpression(getCarbonExpression(name),
             new ListExpression(
@@ -126,12 +142,12 @@ object CarbonFilters {
       aliasMap: CarbonAliasDecoderRelation): Unit = {
     def translate(expr: Expression, or: Boolean = false): Option[sources.Filter] = {
       expr match {
-        case or@ Or(left, right) =>
+        case or@Or(left, right) =>
 
           val leftFilter = translate(left, or = true)
           val rightFilter = translate(right, or = true)
           if (leftFilter.isDefined && rightFilter.isDefined) {
-            Some( sources.Or(leftFilter.get, rightFilter.get))
+            Some(sources.Or(leftFilter.get, rightFilter.get))
           } else {
             or.collect {
               case attr: AttributeReference =>
@@ -227,7 +243,7 @@ object CarbonFilters {
       carbonTable: CarbonTable): Option[CarbonExpression] = {
     def transformExpression(expr: Expression, or: Boolean = false): Option[CarbonExpression] = {
       expr match {
-        case or@ Or(left, right) =>
+        case or@Or(left, right) =>
           val leftFilter = transformExpression(left, true)
           val rightFilter = transformExpression(right, true)
           if (leftFilter.isDefined && rightFilter.isDefined) {
@@ -302,11 +318,11 @@ object CarbonFilters {
             )
           )
         case IsNotNull(child: Attribute) =>
-            Some(new NotEqualsExpression(transformExpression(child).get,
-             transformExpression(Literal(null)).get, true))
+          Some(new NotEqualsExpression(transformExpression(child).get,
+            transformExpression(Literal(null)).get, true))
         case IsNull(child: Attribute) =>
-            Some(new EqualToExpression(transformExpression(child).get,
-             transformExpression(Literal(null)).get, true))
+          Some(new EqualToExpression(transformExpression(child).get,
+            transformExpression(Literal(null)).get, true))
         case Not(In(a: Attribute, list))
           if !list.exists(!_.isInstanceOf[Literal]) =>
           if (list.exists(x => isNullLiteral(x.asInstanceOf[Literal]))) {
@@ -396,9 +412,10 @@ object CarbonFilters {
     }
     exprs.flatMap(transformExpression(_, false)).reduceOption(new AndExpression(_, _))
   }
+
   private def isNullLiteral(exp: Expression): Boolean = {
     if (null != exp
-        &&  exp.isInstanceOf[Literal]
+        && exp.isInstanceOf[Literal]
         && (exp.asInstanceOf[Literal].dataType == org.apache.spark.sql.types.DataTypes.NullType)
         || (exp.asInstanceOf[Literal].value == null)) {
       true
@@ -406,6 +423,7 @@ object CarbonFilters {
       false
     }
   }
+
   private def getActualCarbonDataType(column: String, carbonTable: CarbonTable) = {
     var carbonColumn: CarbonColumn =
       carbonTable.getDimensionByName(carbonTable.getFactTableName, column)
