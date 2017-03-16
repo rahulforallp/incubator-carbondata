@@ -30,8 +30,6 @@ import org.apache.carbondata.core.metadata.datatype.DataType;
 import org.apache.carbondata.core.scan.expression.exception.FilterIllegalMemberException;
 import org.apache.carbondata.core.util.CarbonUtil;
 
-import org.apache.spark.unsafe.types.UTF8String;
-
 public class ExpressionResult implements Comparable<ExpressionResult> {
 
   protected DataType dataType;
@@ -67,10 +65,7 @@ public class ExpressionResult implements Comparable<ExpressionResult> {
   }
 
   public Integer getInt() throws FilterIllegalMemberException {
-    if (value == null ) {
-      return null;
-    }
-    else if ((value instanceof UTF8String) && ((UTF8String) value).trim().numChars() == 0){
+    if (value == null) {
       return null;
     }
     try {
@@ -84,9 +79,6 @@ public class ExpressionResult implements Comparable<ExpressionResult> {
         case SHORT:
           return ((Short) value).intValue();
         case INT:
-          return Integer.parseInt(value.toString());
-        case LONG:
-          return Integer.parseInt(value.toString());
         case DOUBLE:
           if (value instanceof Double) {
             return ((Double) value).intValue();
@@ -111,10 +103,9 @@ public class ExpressionResult implements Comparable<ExpressionResult> {
             }
             return (Integer) value;
           }
-        default: {
+        default:
           throw new FilterIllegalMemberException(
               "Cannot convert" + this.getDataType().name() + " to integer type value");
-        }
       }
 
     } catch (ClassCastException e) {
@@ -125,9 +116,6 @@ public class ExpressionResult implements Comparable<ExpressionResult> {
 
   public Short getShort() throws FilterIllegalMemberException {
     if (value == null) {
-      return null;
-    }
-    else if (value.toString().trim().length() == 0){
       return null;
     }
     try {
@@ -183,9 +171,6 @@ public class ExpressionResult implements Comparable<ExpressionResult> {
     if (value == null) {
       return null;
     }
-    else if (value.toString().trim().length() == 0){
-      return null;
-    }
     try {
       switch (this.getDataType()) {
         case DATE:
@@ -216,9 +201,6 @@ public class ExpressionResult implements Comparable<ExpressionResult> {
 
   public Double getDouble() throws FilterIllegalMemberException {
     if (value == null) {
-      return null;
-    }
-    else if (value.toString().trim().length() == 0){
       return null;
     }
     try {
@@ -267,9 +249,6 @@ public class ExpressionResult implements Comparable<ExpressionResult> {
     if (value == null) {
       return null;
     }
-    else if (value.toString().trim().length() == 0){
-      return null;
-    }
     try {
       switch (this.getDataType()) {
         case STRING:
@@ -312,9 +291,6 @@ public class ExpressionResult implements Comparable<ExpressionResult> {
   //Add to judge for BigDecimal
   public BigDecimal getDecimal() throws FilterIllegalMemberException {
     if (value == null) {
-      return null;
-    }
-    else if (value.toString().trim().length() == 0){
       return null;
     }
     try {
@@ -363,9 +339,6 @@ public class ExpressionResult implements Comparable<ExpressionResult> {
 
   public Long getTime() throws FilterIllegalMemberException {
     if (value == null) {
-      return null;
-    }
-    else if (value.toString().trim().length() == 0){
       return null;
     }
     try {
@@ -420,9 +393,6 @@ public class ExpressionResult implements Comparable<ExpressionResult> {
 
   public Boolean getBoolean() throws FilterIllegalMemberException {
     if (value == null) {
-      return null;
-    }
-    else if (value.toString().trim().length() == 0){
       return null;
     }
     try {
