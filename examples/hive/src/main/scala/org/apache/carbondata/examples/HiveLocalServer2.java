@@ -217,7 +217,7 @@ public class HiveLocalServer2  {
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_IN_TEST, true);
     hiveConf.setVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_BIND_HOST, String.valueOf(hiveServer2Hostname));
     hiveConf.setIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_PORT, hiveServer2Port);
-    hiveConf.setVar(HiveConf.ConfVars.HIVE_ZOOKEEPER_QUORUM, zookeeperConnectionString);
+//    hiveConf.setVar(HiveConf.ConfVars.HIVE_ZOOKEEPER_QUORUM, zookeeperConnectionString);
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_SUPPORT_CONCURRENCY, Boolean.TRUE);
   }
 
@@ -245,6 +245,7 @@ public class HiveLocalServer2  {
     }
     catch (Exception x){
       System.out.println("===================starting hivesrver=======================");
+      x.printStackTrace();
     }
     return hiveLocalServer2;
   }

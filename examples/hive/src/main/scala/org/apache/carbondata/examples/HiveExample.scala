@@ -18,7 +18,7 @@
 package org.apache.carbondata.examples
 
 import java.io.File
-import java.sql.DriverManager
+import java.sql.{Connection, DriverManager, ResultSet, Statement}
 
 // Write carbondata file by spark and read it by flink
 // scalastyle:off println
@@ -26,6 +26,8 @@ object HiveExample {
   val currentPath: String = new File(this.getClass.getResource("/").getPath + "../../")
     .getCanonicalPath
 
+  val rootPath = new File(this.getClass.getResource("/").getPath
+                          + "../../../..").getCanonicalPath
   def main(args: Array[String]): Unit = {
 
     val hiveLocalMetaStore = HiveLocalMetaStore.setup(currentPath)
@@ -35,45 +37,57 @@ object HiveExample {
 
     Thread.sleep(1000)
     println("starting client")
-    Class.forName("org.apache.hive.jdbc.HiveDriver");
-
-    val con = DriverManager.getConnection("jdbc:hive2:/jdbc:hive2://localhost:10001/testHiveDb",
-      "",
-      "");
-
-    // Create the DB
     try {
-      val createDbDdl = "CREATE DATABASE IF NOT EXISTS testHiveDb";
-
-      val stmt = con.createStatement();
-      stmt.execute(createDbDdl);
-    } catch {
-      case e: Exception => e.printStackTrace();
+      Class.forName("org.apache.hive.jdbc.HiveDriver")
     }
+    catch {
+      case classNotFoundException: ClassNotFoundException =>
+        // TODO Auto-generated catch block
+        classNotFoundException.printStackTrace()
+        System.exit(1)
+    }
+    //replace " " here with the name of the user the queries should run as
+    val con: Connection = DriverManager
+      .getConnection("jdbc:hive2://localhost:10001/default", "", "")
+    val stmt: Statement = con.createStatement
+    println("============HIVE CLI IS STARTED=============")
 
-    // Drop the table incase it still exists
-    val dropDdl = "DROP TABLE if exists testHiveDb.testHiveTb ";
-    val stmt1 = con.createStatement();
-    stmt1.execute(dropDdl);
+    stmt
+      .execute(s"ADD JAR $rootPath/assembly/target/scala-2.11/carbondata_2.11-1.1" +
+               s".0-incubating-SNAPSHOT-shade-hadoop2.7.2.jar ")
+    stmt
+      .execute(s"ADD JAR $rootPath/integration/hive/target/carbondata-hive-1.1" +
+               s".0-incubating-SNAPSHOT.jar")
 
-    // Create the ORC table
-    val createDdl = "CREATE TABLE IF NOT EXISTS testHiveDb.testHiveTb PARTITIONED BY (dt STRING) " +
-                    "CLUSTERED BY (id) INTO 16 BUCKETS " +
-                    "STORED AS ORC tblproperties(\"orc.compress\"=\"NONE\")";
-    val stmt2 = con.createStatement();
-    stmt2.execute(createDdl);
+    stmt.execute("create table if not exists " + "hive_carbon_example " +
+                 " (id int, name string)")
 
-    // Issue a describe on the new table and display the output
-    val resultSet = stmt2.executeQuery("DESCRIBE FORMATTED testHiveDb.testHiveTb");
-    while (resultSet.next()) {
-      var i = 0;
-      do {
-        System.out.print(resultSet.getString(i));
-        i = i + 1
-      }
-      while (resultSet.getString(i) != null)
+    stmt
+      .execute(
+        "alter table hive_carbon_example set FILEFORMAT INPUTFORMAT \"org.apache.carbondata." +
+        "hive.MapredCarbonInputFormat\"OUTPUTFORMAT \"org.apache.carbondata.hive." +
+        "MapredCarbonOutputFormat\"SERDE \"org.apache.carbondata.hive." +
+        "CarbonHiveSerDe\" ")
 
-      System.out.println();
+    stmt
+      .execute(
+        "alter table hive_carbon_example set LOCATION " +
+        "'hdfs://localhost:54310/opt/carbonStore/default/hive_carbon_example' ")
+
+    stmt.execute("set hive.mapred.supports.subdirectories=true")
+    stmt.execute("set mapreduce.input.fileinputformat.input.dir.recursive=true")
+
+    val sql = "select id from hive_carbon_example"
+
+    val res: ResultSet = stmt.executeQuery(sql)
+    if (res.next) {
+      val result = res.getString("id")
+      System.out.println("+---+")
+      System.out.println("| id|")
+      System.out.println("+---+")
+      System.out.println(s"| $result |")
+      System.out.println("+---+")
+
     }
 
     hiveLocalServer2.stop(true)

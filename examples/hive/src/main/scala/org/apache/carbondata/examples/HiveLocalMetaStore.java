@@ -196,7 +196,6 @@ public class HiveLocalMetaStore  {
     hiveConf.setVar(HiveConf.ConfVars.METASTOREWAREHOUSE, new File(hiveWarehouseDir).getAbsolutePath());
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_IN_TEST, true);
 
-    // Handle Windows
     LibsUtils.setHadoopHome();
   }
 
@@ -210,6 +209,7 @@ public class HiveLocalMetaStore  {
   public void prepDb() throws Exception {
     LOG.info("HIVE METASTORE: Prepping the database");
     TxnDbUtil.setConfValues(hiveConf);
+    TxnDbUtil.cleanDb();
     TxnDbUtil.prepDb();
   }
 
@@ -226,8 +226,9 @@ public class HiveLocalMetaStore  {
       hiveLocalMetaStore.start();
     }
     catch (Exception x){
-      System.out.println("================= starting metastore==========");
 
+      System.out.println("================= starting metastore==========");
+      x.printStackTrace();
     }
     return hiveLocalMetaStore;
   }
@@ -244,8 +245,8 @@ public class HiveLocalMetaStore  {
     hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES, 3);
     hiveConf.set(HiveConf.ConfVars.PREEXECHOOKS.varname, "");
     hiveConf.set(HiveConf.ConfVars.POSTEXECHOOKS.varname, "");
-    System.setProperty(HiveConf.ConfVars.PREEXECHOOKS.varname, " ");
-    System.setProperty(HiveConf.ConfVars.POSTEXECHOOKS.varname, " ");
+    System.setProperty(HiveConf.ConfVars.PREEXECHOOKS.varname, "");
+    System.setProperty(HiveConf.ConfVars.POSTEXECHOOKS.varname, "");
     return hiveConf;
   }
 
