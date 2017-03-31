@@ -195,8 +195,6 @@ public class HiveLocalMetaStore  {
         "jdbc:derby:;databaseName=" + hiveMetastoreDerbyDbDir + ";create=true");
     hiveConf.setVar(HiveConf.ConfVars.METASTOREWAREHOUSE, new File(hiveWarehouseDir).getAbsolutePath());
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_IN_TEST, true);
-
-    LibsUtils.setHadoopHome();
   }
 
 
@@ -234,9 +232,6 @@ public class HiveLocalMetaStore  {
   }
 
   public static HiveConf buildHiveConf() {
-    // Handle Windows
-    LibsUtils.setHadoopHome();
-
     HiveConf hiveConf = new HiveConf();
     hiveConf.set(HiveConf.ConfVars.HIVE_TXN_MANAGER.varname, "org.apache.hadoop.hive.ql.lockmgr.DbTxnManager");
     hiveConf.set(HiveConf.ConfVars.HIVE_COMPACTOR_INITIATOR_ON.varname, "true");

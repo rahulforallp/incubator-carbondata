@@ -205,9 +205,6 @@ public class HiveLocalServer2  {
 
   public void configure() throws Exception {
 
-    // Handle Windows
-    LibsUtils.setHadoopHome();
-
     hiveConf.setVar(HiveConf.ConfVars.METASTOREURIS,
         "thrift://" + hiveMetastoreHostname + ":" + hiveMetastorePort);
     hiveConf.setVar(HiveConf.ConfVars.SCRATCHDIR, hiveScratchDir);
