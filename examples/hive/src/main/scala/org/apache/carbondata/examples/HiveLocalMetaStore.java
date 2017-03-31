@@ -215,7 +215,7 @@ public class HiveLocalMetaStore  {
     HiveLocalMetaStore hiveLocalMetaStore = new Builder()
         .setHiveMetastoreHostname("localhost")
         .setHiveMetastorePort(10011)
-        .setHiveMetastoreDerbyDbDir(currentPath+"/target/testHiveDb")
+        .setHiveMetastoreDerbyDbDir(currentPath+"/target/metastore_db")
         .setHiveScratchDir(currentPath+"/target")
         .setHiveWarehouseDir(currentPath+"/target")
         .setHiveConf(buildHiveConf())

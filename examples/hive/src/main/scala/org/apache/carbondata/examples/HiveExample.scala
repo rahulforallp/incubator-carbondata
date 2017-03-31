@@ -48,7 +48,7 @@ object HiveExample {
     }
     //replace " " here with the name of the user the queries should run as
     val con: Connection = DriverManager
-      .getConnection("jdbc:hive2://localhost:10001/default", "", "")
+      .getConnection("jdbc:hive2://localhost:10001/metastore_db", "", "")
     val stmt: Statement = con.createStatement
     println("============HIVE CLI IS STARTED=============")
 
