@@ -322,6 +322,7 @@
         <module>integration/hive</module>
         <module>examples/spark2</module>
         <module>examples/flink</module>
+        <module>examples/hive</module>
       </modules>
     </profile>
     <profile>
@@ -393,6 +394,7 @@
       </properties>
       <modules>
         <module>integration/hive</module>
+        <module>examples/hive</module>
       </modules>
     </profile>
     <profile>
