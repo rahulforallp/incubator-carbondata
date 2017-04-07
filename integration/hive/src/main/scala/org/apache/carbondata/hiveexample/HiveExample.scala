@@ -36,8 +36,8 @@ object HiveExample {
   def main(args: Array[String]) {
     val rootPath = new File(this.getClass.getResource("/").getPath
                             + "../../../..").getCanonicalPath
-    val warehouse = s"$rootPath/examples/hive/target/warehouse"
-    val metaStore_Db = s"$rootPath/examples/hive/target/carbon_metaStore_db"
+    val warehouse = s"$rootPath/integration/hive/target/warehouse"
+    val metaStore_Db = s"$rootPath/integration/hive/target/carbon_metaStore_db"
     val logger = LogServiceFactory.getLogService(this.getClass.getCanonicalName)
 
     import org.apache.spark.sql.CarbonSession._
