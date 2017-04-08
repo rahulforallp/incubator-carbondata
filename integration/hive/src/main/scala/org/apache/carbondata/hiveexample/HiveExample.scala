@@ -36,11 +36,14 @@ object HiveExample {
   def main(args: Array[String]) {
     val rootPath = new File(this.getClass.getResource("/").getPath
                             + "../../../..").getCanonicalPath
+    val store = s"$rootPath/integration/hive/target/store"
     val warehouse = s"$rootPath/integration/hive/target/warehouse"
     val metaStore_Db = s"$rootPath/integration/hive/target/carbon_metaStore_db"
     val logger = LogServiceFactory.getLogService(this.getClass.getCanonicalName)
 
     import org.apache.spark.sql.CarbonSession._
+
+    System.setProperty("hadoop.home.dir", "/")
 
     val carbon = SparkSession
       .builder()
@@ -48,7 +51,12 @@ object HiveExample {
       .appName("HiveExample")
       .config("carbon.sql.warehouse.dir", warehouse).enableHiveSupport()
       .getOrCreateCarbonSession(
-        "hdfs://localhost:54310/opt/carbonStore", metaStore_Db)
+        store, metaStore_Db)
+
+    val carbonJarPath = s"$rootPath/assembly/target/scala-2.11/carbondata_2.11-1.1" +
+                        s".0-incubating-SNAPSHOT-shade-hadoop2.7.2.jar"
+    val hiveJarPath = s"$rootPath/integration/hive/target/carbondata-hive-1.1" +
+                      s".0-incubating-SNAPSHOT.jar"
 
     carbon.sql("""drop table if exists hive_carbon_example""".stripMargin)
 
@@ -84,19 +92,30 @@ object HiveExample {
 
     logger.info(s"============HIVE CLI IS STARTED ON PORT $port ==============")
 
-    stmt
-      .execute(s"ADD JAR $rootPath/assembly/target/scala-2.11/carbondata_2.11-1.1" +
-               s".0-incubating-SNAPSHOT-shade-hadoop2.7.2.jar")
-    stmt
-      .execute(s"ADD JAR $rootPath/integration/hive/target/carbondata-hive-1.1" +
-               s".0-incubating-SNAPSHOT.jar")
+    try {
+      stmt
+        .execute(s"ADD JAR $carbonJarPath")
+    }
+    catch {
+      case exception: Exception => logger.error(s"Exception Occurs:Jar Not Found $carbonJarPath")
+        hiveEmbeddedServer2.stop()
 
+    }
+    try {
+      stmt
+        .execute(s"ADD JAR $hiveJarPath")
+    }
+    catch {
+      case exception: Exception => logger.error(s"Exception Occurs:Jar Not Found $hiveJarPath")
+        hiveEmbeddedServer2.stop()
+
+    }
     stmt.execute("set hive.mapred.supports.subdirectories=true")
     stmt.execute("set mapreduce.input.fileinputformat.input.dir.recursive=true")
 
+
     stmt.execute("create table if not exists " + "hive_carbon_example " +
                  " (id int, name string,salary double)")
-
     stmt
       .execute(
         "alter table hive_carbon_example set FILEFORMAT INPUTFORMAT \"org.apache.carbondata." +
@@ -107,7 +126,7 @@ object HiveExample {
     stmt
       .execute(
         "alter table hive_carbon_example set LOCATION " +
-        "'hdfs://localhost:54310/opt/carbonStore/default/hive_carbon_example' ")
+        s"'file:///$store/default/hive_carbon_example' ")
 
 
     val sql = "select * from hive_carbon_example"
@@ -122,6 +141,7 @@ object HiveExample {
         println("| id|" + "| name |" + "| salary        |")
 
         println("+---+" + "+-------+" + "+--------------+")
+
         val resultId = res.getString("id")
         val resultName = res.getString("name")
         val resultSalary = res.getString("salary")
@@ -134,8 +154,8 @@ object HiveExample {
         val resultName = res.getString("name")
         val resultSalary = res.getString("salary")
 
-        println(s"| $resultId |" + s"| $resultName |" + s"| $resultSalary |")
-        println("+---+" + "+-------+" + "+------------+")
+        println(s"| $resultId |" + s"| $resultName |" + s"| $resultSalary   |")
+        println("+---+" + "+-------+" + "+--------------+")
       }
       rowsFetched = rowsFetched + 1
     }
