@@ -53,10 +53,15 @@ object HiveExample {
       .getOrCreateCarbonSession(
         store, metaStore_Db)
 
-    val carbonJarPath = s"$rootPath/assembly/target/scala-2.11/carbondata_2.11-1.1" +
-                        s".0-incubating-SNAPSHOT-shade-hadoop2.7.2.jar"
+    val carbonHadoopJarPath = s"$rootPath/assembly/target/scala-2.11/carbondata_2.11-1.1" +
+                              ".0-incubating-SNAPSHOT-shade-hadoop2.7.2.jar"
+
+    val carbon_DefaultHadoopVersion_JarPath =
+      s"$rootPath/assembly/target/scala-2.11/carbondata_2.11-1.1" +
+      ".0-incubating-SNAPSHOT-shade-hadoop2.2.0.jar"
+
     val hiveJarPath = s"$rootPath/integration/hive/target/carbondata-hive-1.1" +
-                      s".0-incubating-SNAPSHOT.jar"
+                      ".0-incubating-SNAPSHOT.jar"
 
     carbon.sql("""drop table if exists hive_carbon_example""".stripMargin)
 
@@ -94,12 +99,20 @@ object HiveExample {
 
     try {
       stmt
-        .execute(s"ADD JAR $carbonJarPath")
+        .execute(s"ADD JAR $carbonHadoopJarPath")
     }
     catch {
-      case exception: Exception => logger.error(s"Exception Occurs:Jar Not Found $carbonJarPath")
-        hiveEmbeddedServer2.stop()
-
+      case exception: Exception =>
+        logger.warn(s"Jar Not Found $carbonHadoopJarPath"+"Looking For hadoop 2.2.0 version jar")
+        try {
+          stmt
+            .execute(s"ADD JAR $carbon_DefaultHadoopVersion_JarPath")
+        }
+        catch {
+          case exception: Exception => logger
+            .error(s"Exception Occurs:Neither One of Jar is Found $carbon_DefaultHadoopVersion_JarPath,$carbonHadoopJarPath"+"Atleast One Should Be Build")
+            hiveEmbeddedServer2.stop()
+        }
     }
     try {
       stmt
