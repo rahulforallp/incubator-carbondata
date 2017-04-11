@@ -63,21 +63,21 @@ object HiveExample {
     val hiveJarPath = s"$rootPath/integration/hive/target/carbondata-hive-1.1" +
                       ".0-incubating-SNAPSHOT.jar"
 
-    carbon.sql("""drop table if exists hive_carbon_example""".stripMargin)
+    carbon.sql("""DROP TABLE IF EXISTS HIVE_CARBON_EXAMPLE""".stripMargin)
 
     carbon
       .sql(
-        """create table hive_carbon_example (id int,name string,salary double) stored by
-          |'carbondata' """
+        """CREATE TABLE HIVE_CARBON_EXAMPLE (ID int,NAME string,SALARY double) STORED BY
+          |'CARBONDATA' """
           .stripMargin)
 
     carbon.sql(
       s"""
-           LOAD DATA LOCAL INPATH '$rootPath/integration/hive/src/main/resources/data.csv' into
-           table
-         hive_carbon_example
+           LOAD DATA LOCAL INPATH '$rootPath/integration/hive/src/main/resources/data.csv' INTO
+           TABLE
+         HIVE_CARBON_EXAMPLE
            """)
-    carbon.sql("select * from hive_carbon_example").show()
+    carbon.sql("SELECT * FROM HIVE_CARBON_EXAMPLE").show()
 
     carbon.stop()
 
@@ -127,22 +127,22 @@ object HiveExample {
     stmt.execute("set mapreduce.input.fileinputformat.input.dir.recursive=true")
 
 
-    stmt.execute("create table if not exists " + "hive_carbon_example " +
-                 " (id int, name string,salary double)")
+    stmt.execute("CREATE TABLE IF NOT EXISTS " + "HIVE_CARBON_EXAMPLE " +
+                 " (ID int, NAME string,SALARY double)")
     stmt
       .execute(
-        "alter table hive_carbon_example set FILEFORMAT INPUTFORMAT \"org.apache.carbondata." +
+        "ALTER TABLE HIVE_CARBON_EXAMPLE SET FILEFORMAT INPUTFORMAT \"org.apache.carbondata." +
         "hive.MapredCarbonInputFormat\"OUTPUTFORMAT \"org.apache.carbondata.hive." +
         "MapredCarbonOutputFormat\"SERDE \"org.apache.carbondata.hive." +
         "CarbonHiveSerDe\" ")
 
     stmt
       .execute(
-        "alter table hive_carbon_example set LOCATION " +
+        "ALTER TABLE HIVE_CARBON_EXAMPLE SET LOCATION " +
         s"'file:///$store/default/hive_carbon_example' ")
 
 
-    val sql = "select * from hive_carbon_example"
+    val sql = "SELECT * FROM HIVE_CARBON_EXAMPLE"
 
     val res: ResultSet = stmt.executeQuery(sql)
 
@@ -151,7 +151,7 @@ object HiveExample {
     while (res.next) {
       if (rowsFetched == 0) {
         println("+---+" + "+-------+" + "+--------------+")
-        println("| id|" + "| name |" + "| salary        |")
+        println("| ID|" + "| NAME |" + "| SALARY        |")
 
         println("+---+" + "+-------+" + "+--------------+")
 
@@ -163,9 +163,9 @@ object HiveExample {
         println("+---+" + "+-------+" + "+--------------+")
       }
       else {
-        val resultId = res.getString("id")
-        val resultName = res.getString("name")
-        val resultSalary = res.getString("salary")
+        val resultId = res.getString("ID")
+        val resultName = res.getString("NAME")
+        val resultSalary = res.getString("SALARY")
 
         println(s"| $resultId |" + s"| $resultName |" + s"| $resultSalary   |")
         println("+---+" + "+-------+" + "+--------------+")
