@@ -18,8 +18,10 @@ package org.apache.carbondata.hive;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import javax.annotation.Nullable;
 
@@ -83,27 +85,33 @@ public class CarbonHiveSerDe extends AbstractSerDe {
 
     final TypeInfo rowTypeInfo;
     final List<String> columnNames;
-    final List<TypeInfo> columnTypes;
+     List<TypeInfo> columnTypes;
     // Get column names and sort order
     final String columnNameProperty = tbl.getProperty(serdeConstants.LIST_COLUMNS);
     final String columnTypeProperty = tbl.getProperty(serdeConstants.LIST_COLUMN_TYPES);
-
-    System.out.println("\n\n===================Example\n");
-    for (String tab : Parser.getInstance().getColumnList()) {
-      System.out.println("Columns =" + tab);
+    if (Parser.getInstance().getColumnList().size() > 0) {
+      columnNames = new ArrayList<>();
+      for (String tab : Parser.getInstance().getColumnList()) {
+        System.out.println("Columns =" + tab);
+        columnNames.add(tab);
+      }
     }
-
-    if (columnNameProperty.length() == 0) {
+    else if (columnNameProperty.length() == 0) {
       columnNames = new ArrayList<String>();
-    } else {
+    }
+    else {
       columnNames = Arrays.asList(columnNameProperty.split(","));
     }
+
     if (columnTypeProperty.length() == 0) {
       columnTypes = new ArrayList<TypeInfo>();
     } else {
       columnTypes = TypeInfoUtils.getTypeInfosFromTypeString(columnTypeProperty);
     }
     // Create row related objects
+    Map<String , TypeInfo> schemaMap = createSchemaMap(columnNameProperty,columnTypes);
+
+    columnTypes=getDataType(columnNames,schemaMap);
     rowTypeInfo = TypeInfoFactory.getStructTypeInfo(columnNames, columnTypes);
     this.objInspector = new CarbonObjectInspector((StructTypeInfo) rowTypeInfo);
 
@@ -111,6 +119,26 @@ public class CarbonHiveSerDe extends AbstractSerDe {
     serializedSize = 0;
     deserializedSize = 0;
     status = LAST_OPERATION.UNKNOWN;
+  }
+
+  public Map<String,TypeInfo> createSchemaMap(String columnNameProperty,List<TypeInfo> typeInfoList){
+  List<String> columnNames = Arrays.asList(columnNameProperty.split(","));
+    Map<String , TypeInfo> schemaMap = new HashMap<>();
+    int i=0;
+    for (String col : columnNames) {
+      schemaMap.put(col,typeInfoList.get(i));
+      i++;
+    }
+    return schemaMap;
+  }
+  
+  public List<TypeInfo> getDataType(List<String> columnNames,Map<String,TypeInfo> schemaMap){
+    List<TypeInfo> typeInfos = new ArrayList<>();
+    for (String col : columnNames) {
+      typeInfos.add(schemaMap.get(col));
+    }
+
+    return typeInfos;
   }
 
   @Override

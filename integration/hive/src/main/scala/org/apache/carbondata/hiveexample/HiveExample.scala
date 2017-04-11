@@ -140,8 +140,8 @@ object HiveExample {
       .execute(
         "ALTER TABLE HIVE_CARBON_EXAMPLE SET LOCATION " +
         s"'file:///$store/default/hive_carbon_example' ")
-
-    val sql = "SELECT name FROM HIVE_CARBON_EXAMPLE"
+try{
+    val sql = "SELECT name,salary FROM HIVE_CARBON_EXAMPLE"
 
    val parser =  org.apache.carbondata.hive.Parser.getInstance()
 parser.getInfo(sql)
@@ -158,24 +158,28 @@ parser.getInfo(sql)
 
         println("+---+" + "+-------+" + "+--------------+")
 
-        val resultId = res.getString("id")
+//        val resultId = res.getString("id")
         val resultName = res.getString("name")
         val resultSalary = res.getString("salary")
 
-        println(s"| $resultId |" + s"| $resultName |" + s"| $resultSalary  |")
+        println(/*s"| $resultId |" */ s"| $resultName |" + s"| $resultSalary  |")
         println("+---+" + "+-------+" + "+--------------+")
       }
       else {
-        val resultId = res.getString("ID")
+//        val resultId = res.getString("ID")
         val resultName = res.getString("NAME")
         val resultSalary = res.getString("SALARY")
 
-        println(s"| $resultId |" + s"| $resultName |" + s"| $resultSalary   |")
+        println(/*s"| $resultId |"+*/  s"| $resultName |" + s"| $resultSalary   |")
         println("+---+" + "+-------+" + "+--------------+")
       }
       rowsFetched = rowsFetched + 1
     }
     println(s"******Total Number Of Rows Fetched ****** $rowsFetched")
+}
+    catch {
+      case c:Exception => c.printStackTrace()
+    }
     hiveEmbeddedServer2.stop()
   }
 
