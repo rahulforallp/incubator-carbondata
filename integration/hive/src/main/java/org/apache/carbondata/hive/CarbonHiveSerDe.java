@@ -88,6 +88,11 @@ public class CarbonHiveSerDe extends AbstractSerDe {
     final String columnNameProperty = tbl.getProperty(serdeConstants.LIST_COLUMNS);
     final String columnTypeProperty = tbl.getProperty(serdeConstants.LIST_COLUMN_TYPES);
 
+    System.out.println("\n\n===================Example\n");
+    for (String tab : Parser.getInstance().getColumnList()) {
+      System.out.println("Columns =" + tab);
+    }
+
     if (columnNameProperty.length() == 0) {
       columnNames = new ArrayList<String>();
     } else {

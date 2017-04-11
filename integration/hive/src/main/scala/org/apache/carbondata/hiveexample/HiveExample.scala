@@ -22,6 +22,7 @@ import java.sql.{DriverManager, ResultSet, SQLException, Statement}
 import org.apache.spark.sql.SparkSession
 
 import org.apache.carbondata.common.logging.LogServiceFactory
+import org.apache.carbondata.hive.Parser
 import org.apache.carbondata.hive.server.HiveEmbeddedServer2
 
 object HiveExample {
@@ -78,7 +79,6 @@ object HiveExample {
          HIVE_CARBON_EXAMPLE
            """)
     carbon.sql("SELECT * FROM HIVE_CARBON_EXAMPLE").show()
-
     carbon.stop()
 
     try {
@@ -110,7 +110,7 @@ object HiveExample {
         }
         catch {
           case exception: Exception => logger
-            .error(s"Exception Occurs:Neither One of Jar is Found $carbon_DefaultHadoopVersion_JarPath,$carbonHadoopJarPath"+"Atleast One Should Be Build")
+            .error(s"Exception Occurs:Neither One of Jar is Found $carbon_DefaultHadoopVersion_JarPath,$carbonHadoopJarPath Atleast One Should Be Build")
             hiveEmbeddedServer2.stop()
         }
     }
@@ -141,8 +141,11 @@ object HiveExample {
         "ALTER TABLE HIVE_CARBON_EXAMPLE SET LOCATION " +
         s"'file:///$store/default/hive_carbon_example' ")
 
+    val sql = "SELECT name FROM HIVE_CARBON_EXAMPLE"
 
-    val sql = "SELECT * FROM HIVE_CARBON_EXAMPLE"
+   val parser =  org.apache.carbondata.hive.Parser.getInstance()
+parser.getInfo(sql)
+
 
     val res: ResultSet = stmt.executeQuery(sql)
 
