@@ -400,10 +400,9 @@ private[sql] case class AlterTableDataTypeChange(
       columnSchemaList.foreach { columnSchema =>
         if (columnSchema.column_name.equalsIgnoreCase(absoluteColumnname)) {
           deletedColumnSchema = columnSchema.deepCopy
-          if (alterTableDataTypeChangeModel.dataTypeInfo.dataType.toLowerCase.equals("arraydimension = true")){
+          if (alterTableDataTypeChangeModel.dataTypeInfo.dataType.toLowerCase.equals("array")){
             columnSchema.setData_type(DataTypeConverterUtil
               .convertToThriftDataType(alterTableDataTypeChangeModel.complexDataType.get))
-            columnSchema.setColumn_name(absoluteColumnname)
           }
           else {
             columnSchema.setData_type(DataTypeConverterUtil
