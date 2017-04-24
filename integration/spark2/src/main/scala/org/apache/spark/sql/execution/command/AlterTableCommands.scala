@@ -393,11 +393,22 @@ private[sql] case class AlterTableDataTypeChange(
       var addColumnSchema: ColumnSchema = null
       var deletedColumnSchema: ColumnSchema = null
       val columnSchemaList = tableInfo.fact_table.table_columns.asScala.filter(!_.isInvisible)
+      val absoluteColumnname =  (alterTableDataTypeChangeModel.dataTypeInfo.dataType.toLowerCase match {
+        case "array" =>alterTableDataTypeChangeModel.columnName+".val"
+        case _ => alterTableDataTypeChangeModel.columnName
+      })
       columnSchemaList.foreach { columnSchema =>
-        if (columnSchema.column_name.equalsIgnoreCase(columnName)) {
+        if (columnSchema.column_name.equalsIgnoreCase(absoluteColumnname)) {
           deletedColumnSchema = columnSchema.deepCopy
-          columnSchema.setData_type(DataTypeConverterUtil
+          if (alterTableDataTypeChangeModel.dataTypeInfo.dataType.toLowerCase.equals("arraydimension = true")){
+            columnSchema.setData_type(DataTypeConverterUtil
+              .convertToThriftDataType(alterTableDataTypeChangeModel.complexDataType.get))
+            columnSchema.setColumn_name(absoluteColumnname)
+          }
+          else {
+            columnSchema.setData_type(DataTypeConverterUtil
             .convertToThriftDataType(alterTableDataTypeChangeModel.dataTypeInfo.dataType))
+          }
           columnSchema.setPrecision(alterTableDataTypeChangeModel.dataTypeInfo.precision)
           columnSchema.setScale(alterTableDataTypeChangeModel.dataTypeInfo.scale)
           addColumnSchema = columnSchema

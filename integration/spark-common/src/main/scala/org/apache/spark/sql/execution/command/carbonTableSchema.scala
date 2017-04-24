@@ -133,7 +133,7 @@ case class AlterTableDataTypeChangeModel(dataTypeInfo: DataTypeInfo,
     databaseName: Option[String],
     tableName: String,
     columnName: String,
-    newColumnName: String)
+    newColumnName: String,complexDataType :Option[String])
 
 case class AlterTableRenameModel(
     oldTableIdentifier: TableIdentifier,

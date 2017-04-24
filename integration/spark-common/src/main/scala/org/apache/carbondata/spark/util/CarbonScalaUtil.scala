@@ -158,6 +158,14 @@ object CarbonScalaUtil {
                 .getDataType.getName
             } cannot be modified. Int can only be changed to bigInt")
         }
+      case "ARRAY" =>
+        if (!dataTypeInfo.dataType.equals("array")) {
+          sys
+            .error(s"Given column ${ carbonColumn.getColName } with data type ${
+              carbonColumn
+                .getDataType.getName
+            } cannot be modified. Int can only be changed to bigint")
+        }
       case "DECIMAL" =>
         if (!dataTypeInfo.dataType.equals("decimal")) {
           sys
