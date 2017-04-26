@@ -21,10 +21,13 @@ import java.io.IOException;
 import org.apache.carbondata.core.metadata.AbsoluteTableIdentifier;
 import org.apache.carbondata.core.metadata.datatype.DataType;
 import org.apache.carbondata.core.metadata.schema.table.column.CarbonColumn;
+import org.apache.carbondata.core.metadata.schema.table.column.CarbonDimension;
 import org.apache.carbondata.hadoop.readsupport.impl.DictionaryDecodeReadSupport;
 
 import org.apache.spark.sql.catalyst.InternalRow;
 import org.apache.spark.sql.catalyst.expressions.GenericInternalRow;
+import org.apache.spark.sql.catalyst.util.ArrayData;
+import org.apache.spark.sql.catalyst.util.GenericArrayData;
 
 public class SparkRowReadSupportImpl extends DictionaryDecodeReadSupport<InternalRow> {
 
@@ -44,6 +47,17 @@ public class SparkRowReadSupportImpl extends DictionaryDecodeReadSupport<Interna
           data[i] = ((Long)(data[i])).intValue();
         } else if (dataTypes[i].equals(DataType.SHORT)) {
           data[i] = ((Long)(data[i])).shortValue();
+        }
+        else if (dataTypes[i].equals(DataType.ARRAY)){
+          if (((CarbonDimension) carbonColumns[i]).getListOfChildDimensions().get(0).getColumnSchema().getDataType() == DataType.LONG && ((GenericArrayData) data[i]).array()[0] instanceof Integer){
+            Long[] l = new Long[((GenericArrayData) data[i]).array().length];
+            int j =0 ;
+            for (Object a : ((GenericArrayData) data[i]).array()) {
+              l[j] = ((Number) a).longValue();
+              j++;
+            }
+            data[i]=ArrayData.toArrayData(l);
+          }
         }
       }
     }
