@@ -50,13 +50,13 @@ public class SparkRowReadSupportImpl extends DictionaryDecodeReadSupport<Interna
         }
         else if (dataTypes[i].equals(DataType.ARRAY)){
           if (((CarbonDimension) carbonColumns[i]).getListOfChildDimensions().get(0).getColumnSchema().getDataType() == DataType.LONG && ((GenericArrayData) data[i]).array()[0] instanceof Integer){
-            Long[] l = new Long[((GenericArrayData) data[i]).array().length];
+            Long[] longData = new Long[((GenericArrayData) data[i]).array().length];
             int j =0 ;
-            for (Object a : ((GenericArrayData) data[i]).array()) {
-              l[j] = ((Number) a).longValue();
+            for (Object object : ((GenericArrayData) data[i]).array()) {
+              longData[j] = ((Number) object).longValue();
               j++;
             }
-            data[i]=ArrayData.toArrayData(l);
+            data[i]=ArrayData.toArrayData(longData);
           }
         }
       }
