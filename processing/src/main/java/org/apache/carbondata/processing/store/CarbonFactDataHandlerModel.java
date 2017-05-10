@@ -327,8 +327,17 @@ public class CarbonFactDataHandlerModel {
             carbonTable.getMeasureByTableName(tableName));
     carbonFactDataHandlerModel.setWrapperColumnSchema(wrapperColumnSchema);
     // get the cardinality for all all the columns including no dictionary columns
+
+    int[] dimColumnCardinality = segmentProperties.getDimColumnsCardinality();
+    int[] complexDimColumnCardinality = segmentProperties.getComplexDimColumnCardinality();
+    int[] columnCardinality = new int[dimColumnCardinality.length+complexDimColumnCardinality.length];
+    System.arraycopy(dimColumnCardinality, 0, columnCardinality, 0, dimColumnCardinality.length);
+    System.arraycopy(complexDimColumnCardinality, 0, columnCardinality, dimColumnCardinality.length, complexDimColumnCardinality.length);
+
+
     int[] formattedCardinality = CarbonUtil
-        .getFormattedCardinality(segmentProperties.getDimColumnsCardinality(), wrapperColumnSchema);
+        .getFormattedCardinality(columnCardinality, wrapperColumnSchema);
+
     carbonFactDataHandlerModel.setColCardinality(formattedCardinality);
     //TO-DO Need to handle complex types here .
     Map<Integer, GenericDataType> complexIndexMap =

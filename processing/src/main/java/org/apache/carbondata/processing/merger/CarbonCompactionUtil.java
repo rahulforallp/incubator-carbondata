@@ -318,6 +318,17 @@ public class CarbonCompactionUtil {
         updatedCardinalityList.add(value);
       }
       updatedColumnSchemaList.add(dimension.getColumnSchema());
+      if (dimension.isComplex()){
+        for (CarbonDimension carbonDimension : dimension.getListOfChildDimensions()) {
+          Integer cardinality = columnCardinalityMap.get(dimension.getColumnId());
+          if (null == cardinality) {
+            updatedCardinalityList.add(getDimensionDefaultCardinality(dimension));
+          } else {
+            updatedCardinalityList.add(cardinality);
+          }
+          updatedColumnSchemaList.add(carbonDimension.getColumnSchema());
+        }
+      }
     }
     // add measures to the column schema list
     List<CarbonMeasure> masterSchemaMeasures =
