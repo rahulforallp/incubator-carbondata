@@ -537,7 +537,12 @@ public final class ByteUtil {
    */
   public static long toLong(byte[] bytes, int offset, final int length) {
     if (length != SIZEOF_LONG || offset + length > bytes.length) {
-      throw explainWrongLengthOrOffset(bytes, offset, length, SIZEOF_LONG);
+      if (length != SIZEOF_INT || offset + length > bytes.length) {
+        throw explainWrongLengthOrOffset(bytes, offset, length, SIZEOF_LONG);
+      }
+      else {
+        return toInt(bytes,offset,length);
+      }
     }
     long l = 0;
     if (CarbonUnsafe.unsafe != null) {
