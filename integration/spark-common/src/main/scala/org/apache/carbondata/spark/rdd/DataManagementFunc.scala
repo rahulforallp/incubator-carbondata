@@ -381,7 +381,6 @@ object DataManagementFunc {
                 .updateLoadMetadataFromOldToNew(details, latestMetadata)
 
             CarbonLoaderUtil.writeLoadMetadata(storePath, dbName, tableName, latestStatus)
-
           } else {
             val errorMsg = "Clean files request is failed for " +
                 s"$dbName.$tableName" +

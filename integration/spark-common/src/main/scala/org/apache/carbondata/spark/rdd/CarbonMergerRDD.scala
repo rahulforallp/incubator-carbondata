@@ -170,7 +170,10 @@ class CarbonMergerRDD[K, V](
         carbonLoadModel.setStorePath(hdfsStoreLocation)
         // check for restructured block
         // TODO: only in case of add and drop this variable should be true
-        val restructuredBlockExists: Boolean = false
+        val restructuredBlockExists: Boolean = CarbonCompactionUtil
+          .checkIfAnyRestructuredBlockExists(segmentMapping,
+            dataFileMetadataSegMapping,
+            carbonTable.getTableLastUpdatedTime)
         DataTypeUtil.setDataTypeConverter(new SparkDataTypeConverterImpl)
         exec = new CarbonCompactionExecutor(segmentMapping, segmentProperties,
           carbonTable, dataFileMetadataSegMapping, restructuredBlockExists)

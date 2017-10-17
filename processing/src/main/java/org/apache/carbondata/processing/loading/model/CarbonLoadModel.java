@@ -510,22 +510,6 @@ public class CarbonLoadModel implements Serializable {
   }
 
   /**
-   * will return the copy object of the existing object
-   *
-   * @return
-   */
-  public CarbonLoadModel getCopyObject() {
-    CarbonLoadModel copyObj = new CarbonLoadModel();
-    copyObj.tableName = tableName;
-    copyObj.databaseName = databaseName;
-    copyObj.partitionId = partitionId;
-    copyObj.storePath = storePath;
-    copyObj.loadMetadataDetails = loadMetadataDetails;
-    copyObj.carbonDataLoadSchema = carbonDataLoadSchema;
-    return copyObj;
-  }
-
-  /**
    * setLoadMetadataDetails.
    *
    * @param loadMetadataDetails
@@ -606,7 +590,6 @@ public class CarbonLoadModel implements Serializable {
   public String getSerializationNullFormat() {
     return serializationNullFormat;
   }
-
 
   /**
    * the method sets the value to be treated as null while data load

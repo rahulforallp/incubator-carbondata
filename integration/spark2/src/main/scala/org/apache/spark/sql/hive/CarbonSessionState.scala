@@ -17,7 +17,7 @@
 package org.apache.spark.sql.hive
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.spark.sql._
+import org.apache.spark.sql.{CarbonDatasourceHadoopRelation, CarbonEnv, ExperimentalMethods, SparkSession}
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.analysis.{Analyzer, FunctionRegistry}
 import org.apache.spark.sql.catalyst.catalog.{FunctionResourceLoader, GlobalTempViewManager, SessionCatalog}
@@ -31,10 +31,10 @@ import org.apache.spark.sql.execution.strategy.{CarbonLateDecodeStrategy, DDLStr
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.optimizer.CarbonLateDecodeRule
 import org.apache.spark.sql.parser.CarbonSparkSqlParser
-import org.apache.spark.util.Utils
 
 import org.apache.carbondata.core.datamap.DataMapStoreManager
 import org.apache.carbondata.core.metadata.AbsoluteTableIdentifier
+
 
 /**
  * This class will have carbon catalog and refresh the relation from cache if the carbontable in
@@ -55,8 +55,7 @@ class CarbonSessionCatalog(
     functionResourceLoader: FunctionResourceLoader,
     functionRegistry: FunctionRegistry,
     conf: SQLConf,
-    hadoopConf: Configuration,
-    parser: ParserInterface)
+    hadoopConf: Configuration)
   extends HiveSessionCatalog(
     externalCatalog,
     globalTempViewManager,
@@ -64,8 +63,7 @@ class CarbonSessionCatalog(
     functionResourceLoader,
     functionRegistry,
     conf,
-    hadoopConf,
-    parser) {
+    hadoopConf) {
 
   lazy val carbonEnv = {
     val env = new CarbonEnv
@@ -135,15 +133,9 @@ class CarbonSessionState(sparkSession: SparkSession) extends HiveSessionState(sp
 
   override lazy val sqlParser: ParserInterface = new CarbonSparkSqlParser(conf, sparkSession)
 
-  experimentalMethods.extraStrategies = extraStrategies
-
+  experimentalMethods.extraStrategies =
+    Seq(new CarbonLateDecodeStrategy, new DDLStrategy(sparkSession))
   experimentalMethods.extraOptimizations = Seq(new CarbonLateDecodeRule)
-
-  def extraStrategies: Seq[Strategy] = {
-    Seq(new CarbonLateDecodeStrategy,
-      new DDLStrategy(sparkSession))
-  }
-
   override lazy val optimizer: Optimizer = new CarbonOptimizer(catalog, conf, experimentalMethods)
 
   override lazy val analyzer: Analyzer = {
@@ -178,8 +170,7 @@ class CarbonSessionState(sparkSession: SparkSession) extends HiveSessionState(sp
       functionResourceLoader,
       functionRegistry,
       conf,
-      newHadoopConf(),
-      sqlParser)
+      newHadoopConf())
   }
 }
 
@@ -216,20 +207,3 @@ class CarbonOptimizer(
     super.execute(transFormedPlan)
   }
 }
-
-object SessionStateFactory {
-
-  def getSessionState(sparkSession: SparkSession, className: String): HiveSessionState = {
-    className match {
-      case "org.apache.spark.sql.si.hive.CarbonInternalSessionState" =>
-        // use reflection to create an object for internal session state
-        val clazz = Utils.classForName(className)
-        val constructors = clazz.getConstructors()(0)
-        val sessionStateInstance = constructors.newInstance(sparkSession)
-          .asInstanceOf[HiveSessionState]
-        sessionStateInstance
-      case _ => new CarbonSessionState(sparkSession)
-    }
-  }
-}
-

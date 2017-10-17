@@ -202,7 +202,7 @@ abstract class CarbonDDLSqlParser extends AbstractCarbonSparkSQLParser {
    * @param keys
    * @return
    */
-  protected def carbonKeyWord(keys: String) = {
+  private def carbonKeyWord(keys: String) = {
     ("(?i)" + keys).r
   }
 

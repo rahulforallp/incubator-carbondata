@@ -15,28 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.carbondata.processing.merger;
+package org.apache.carbondata.events
 
-import java.io.Serializable;
+import org.apache.carbondata.core.metadata.CarbonTableIdentifier
+import org.apache.carbondata.processing.loading.model.CarbonLoadModel
 
-import org.apache.carbondata.core.metadata.CarbonTableIdentifier;
-import org.apache.carbondata.core.metadata.schema.table.CarbonTable;
+/**
+ * event for database operations
+ */
+trait DatabaseEvent extends Event {
+  val databaseName: String
+}
 
-public class TableMeta implements Serializable {
+/**
+ * event for table related operations
+ */
+trait TableEvent extends DatabaseEvent {
+  val carbonTableIdentifier: CarbonTableIdentifier
+  override lazy val databaseName: String = carbonTableIdentifier.getDatabaseName
+}
 
-  private static final long serialVersionUID = -1749874611119829431L;
-
-  public CarbonTableIdentifier carbonTableIdentifier;
-  public String storePath;
-  public CarbonTable carbonTable;
-  public String tablePath;
-
-  public TableMeta(CarbonTableIdentifier carbonTableIdentifier, String storePath, String tablePath,
-      CarbonTable carbonTable) {
-    this.carbonTableIdentifier = carbonTableIdentifier;
-    this.storePath = storePath;
-    this.tablePath = tablePath;
-    this.carbonTable = carbonTable;
-  }
-
+/**
+ * event for load operations
+ */
+trait LoadEvent extends TableEvent {
+  val carbonLoadModel: CarbonLoadModel
 }

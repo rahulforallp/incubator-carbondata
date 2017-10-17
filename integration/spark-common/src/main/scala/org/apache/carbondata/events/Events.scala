@@ -25,30 +25,30 @@ import org.apache.carbondata.events.Event
 import org.apache.carbondata.processing.loading.model.CarbonLoadModel
 
 /**
- * event for database operations
- */
+  * event for database operations
+  */
 trait DatabaseEvent extends Event {
   val databaseName: String
 }
 
 /**
- * event for table related operations
- */
+  * event for table related operations
+  */
 trait TableEvent extends DatabaseEvent {
   val carbonTableIdentifier: CarbonTableIdentifier
   override lazy val databaseName: String = carbonTableIdentifier.getDatabaseName
 }
 
 /**
- * event for load operations
- */
+  * event for load operations
+  */
 trait LoadEvent extends TableEvent {
   val carbonLoadModel: CarbonLoadModel
 }
 
 /**
- * event for lookup
- */
+  * event for lookup
+  */
 trait LookupRelationEvent extends TableEvent {
   val carbonTable: CarbonTable
   override val carbonTableIdentifier = carbonTable.getCarbonTableIdentifier
@@ -56,8 +56,8 @@ trait LookupRelationEvent extends TableEvent {
 
 
 /**
- * event for drop table
- */
+  * event for drop table
+  */
 trait DropTableEvent extends TableEvent {
   val carbonTable: CarbonTable
   val ifExistsSet: Boolean
@@ -65,8 +65,8 @@ trait DropTableEvent extends TableEvent {
 }
 
 /**
- * event for alter_table_drop_column
- */
+  * event for alter_table_drop_column
+  */
 trait AlterTableDropColumnEvent extends TableEvent {
   val carbonTable: CarbonTable
   val alterTableDropColumnModel: AlterTableDropColumnModel
@@ -74,8 +74,8 @@ trait AlterTableDropColumnEvent extends TableEvent {
 }
 
 /**
- * event for alter_table_rename
- */
+  * event for alter_table_rename
+  */
 trait AlterTableRenameEvent extends TableEvent {
   val carbonTable: CarbonTable
   val alterTableRenameModel: AlterTableRenameModel
@@ -83,8 +83,8 @@ trait AlterTableRenameEvent extends TableEvent {
 }
 
 /**
- * event for alter_table_rename
- */
+  * event for alter_table_rename
+  */
 trait AlterTableCompactionEvent extends TableEvent {
   val carbonTable: CarbonTable
   val carbonLoadModel: CarbonLoadModel
@@ -93,8 +93,8 @@ trait AlterTableCompactionEvent extends TableEvent {
 }
 
 /**
- * event for DeleteSegmentById
- */
+  * event for DeleteSegmentById
+  */
 trait DeleteSegmentbyIdEvent extends TableEvent {
   val carbonTable: CarbonTable
   val loadIds: Seq[String]
@@ -102,8 +102,8 @@ trait DeleteSegmentbyIdEvent extends TableEvent {
 }
 
 /**
- * event for DeleteSegmentByDate
- */
+  * event for DeleteSegmentByDate
+  */
 trait DeleteSegmentbyDateEvent extends TableEvent {
   val carbonTable: CarbonTable
   val loadDates: String
@@ -111,24 +111,24 @@ trait DeleteSegmentbyDateEvent extends TableEvent {
 }
 
 /**
- * event for Clean Files
- */
+  * event for Clean Files
+  */
 trait CleanFilesEvent extends TableEvent {
   val carbonTable: CarbonTable
   override val carbonTableIdentifier: CarbonTableIdentifier = carbonTable.getCarbonTableIdentifier
 }
 
 /**
- * event for update table
- */
+  * event for update table
+  */
 trait UpdateTableEvent extends TableEvent {
   val carbonTable: CarbonTable
   override val carbonTableIdentifier: CarbonTableIdentifier = carbonTable.getCarbonTableIdentifier
 }
 
 /**
- * event for delete from table
- */
+  * event for delete from table
+  */
 trait DeleteFromTableEvent extends TableEvent {
   val carbonTable: CarbonTable
   override val carbonTableIdentifier: CarbonTableIdentifier = carbonTable.getCarbonTableIdentifier
